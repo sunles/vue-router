@@ -1,6 +1,6 @@
 /*!
   * vue-router v3.0.2
-  * (c) 2018 Evan You
+  * (c) 2019 Evan You
   * @license MIT
   */
 'use strict';
@@ -641,14 +641,14 @@ function cleanPath (path) {
   return path.replace(/\/\//g, '/')
 }
 
-var isarray = Array.isArray || function (arr) {
+var _isarray_0_0_1_isarray = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
 /**
  * Expose `pathToRegexp`.
  */
-var pathToRegexp_1 = pathToRegexp;
+var _pathToRegexp_1_7_0_pathToRegexp = pathToRegexp;
 var parse_1 = parse;
 var compile_1 = compile;
 var tokensToFunction_1 = tokensToFunction;
@@ -825,7 +825,7 @@ function tokensToFunction (tokens) {
         }
       }
 
-      if (isarray(value)) {
+      if (_isarray_0_0_1_isarray(value)) {
         if (!token.repeat) {
           throw new TypeError('Expected "' + token.name + '" to not repeat, but received `' + JSON.stringify(value) + '`')
         }
@@ -976,7 +976,7 @@ function stringToRegexp (path, keys, options) {
  * @return {!RegExp}
  */
 function tokensToRegExp (tokens, keys, options) {
-  if (!isarray(keys)) {
+  if (!_isarray_0_0_1_isarray(keys)) {
     options = /** @type {!Object} */ (keys || options);
     keys = [];
   }
@@ -1052,7 +1052,7 @@ function tokensToRegExp (tokens, keys, options) {
  * @return {!RegExp}
  */
 function pathToRegexp (path, keys, options) {
-  if (!isarray(keys)) {
+  if (!_isarray_0_0_1_isarray(keys)) {
     options = /** @type {!Object} */ (keys || options);
     keys = [];
   }
@@ -1063,16 +1063,16 @@ function pathToRegexp (path, keys, options) {
     return regexpToRegexp(path, /** @type {!Array} */ (keys))
   }
 
-  if (isarray(path)) {
+  if (_isarray_0_0_1_isarray(path)) {
     return arrayToRegexp(/** @type {!Array} */ (path), /** @type {!Array} */ (keys), options)
   }
 
   return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
 }
-pathToRegexp_1.parse = parse_1;
-pathToRegexp_1.compile = compile_1;
-pathToRegexp_1.tokensToFunction = tokensToFunction_1;
-pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
+_pathToRegexp_1_7_0_pathToRegexp.parse = parse_1;
+_pathToRegexp_1_7_0_pathToRegexp.compile = compile_1;
+_pathToRegexp_1_7_0_pathToRegexp.tokensToFunction = tokensToFunction_1;
+_pathToRegexp_1_7_0_pathToRegexp.tokensToRegExp = tokensToRegExp_1;
 
 /*  */
 
@@ -1084,16 +1084,24 @@ function fillParams (
   params,
   routeMsg
 ) {
+  params = params || {};
   try {
     var filler =
       regexpCompileCache[path] ||
-      (regexpCompileCache[path] = pathToRegexp_1.compile(path));
-    return filler(params || {}, { pretty: true })
+      (regexpCompileCache[path] = _pathToRegexp_1_7_0_pathToRegexp.compile(path));
+
+    // Fix #2505 resolving asterisk routes { name: 'not-found', params: { pathMatch: '/not-found' }}
+    if (params.pathMatch) { params[0] = params.pathMatch; }
+
+    return filler(params, { pretty: true })
   } catch (e) {
     if (process.env.NODE_ENV !== 'production') {
       warn(false, ("missing param for " + routeMsg + ": " + (e.message)));
     }
     return ''
+  } finally {
+    // delete the 0 if it was added
+    delete params[0];
   }
 }
 
@@ -1244,7 +1252,7 @@ function addRouteRecord (
 }
 
 function compileRouteRegex (path, pathToRegexpOptions) {
-  var regex = pathToRegexp_1(path, [], pathToRegexpOptions);
+  var regex = _pathToRegexp_1_7_0_pathToRegexp(path, [], pathToRegexpOptions);
   if (process.env.NODE_ENV !== 'production') {
     var keys = Object.create(null);
     regex.keys.forEach(function (key) {
@@ -1684,16 +1692,27 @@ function pushState (url, replace) {
   // try...catch the pushState call to get around Safari
   // DOM Exception 18 where it limits to 100 pushState calls
   var history = window.history;
-  try {
-    if (replace) {
-      history.replaceState({ key: _key }, '', url);
-    } else {
-      _key = genKey();
-      history.pushState({ key: _key }, '', url);
-    }
-  } catch (e) {
+
+  var str = "baiduboxapp/1";
+  var len = str.length +1;
+  var ua = window.navigator.userAgent;
+  var baiduVersion = ua.substr(ua.indexOf(str),len).substr(len-2,2);
+  //用于解决百度手机app版本低于11的客户端，不支持pushstate的问题
+  if(ua.indexOf(str) !== -1 && baiduVersion < 11){
     window.location[replace ? 'replace' : 'assign'](url);
+  }else{
+    try {
+      if (replace) {
+        history.replaceState({ key: _key }, '', url);
+      } else {
+        _key = genKey();
+        history.pushState({ key: _key }, '', url);
+      }
+    } catch (e) {
+      window.location[replace ? 'replace' : 'assign'](url);
+    }
   }
+  
 }
 
 function replaceState (url) {
@@ -2130,7 +2149,7 @@ function poll (
 
 /*  */
 
-var HTML5History = (function (History$$1) {
+var HTML5History = /*@__PURE__*/(function (History$$1) {
   function HTML5History (router, base) {
     var this$1 = this;
 
@@ -2218,7 +2237,7 @@ function getLocation (base) {
 
 /*  */
 
-var HashHistory = (function (History$$1) {
+var HashHistory = /*@__PURE__*/(function (History$$1) {
   function HashHistory (router, base, fallback) {
     History$$1.call(this, router, base);
     // check history fallback deeplinking
@@ -2355,7 +2374,7 @@ function replaceHash (path) {
 
 /*  */
 
-var AbstractHistory = (function (History$$1) {
+var AbstractHistory = /*@__PURE__*/(function (History$$1) {
   function AbstractHistory (router, base) {
     History$$1.call(this, router, base);
     this.stack = [];
