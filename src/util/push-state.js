@@ -42,16 +42,27 @@ export function pushState (url?: string, replace?: boolean) {
   // try...catch the pushState call to get around Safari
   // DOM Exception 18 where it limits to 100 pushState calls
   const history = window.history
-  try {
-    if (replace) {
-      history.replaceState({ key: _key }, '', url)
-    } else {
-      _key = genKey()
-      history.pushState({ key: _key }, '', url)
-    }
-  } catch (e) {
+
+  const str = "baiduboxapp/1";
+  const len = str.length +1;
+  const ua = window.navigator.userAgent
+  const baiduVersion = ua.substr(ua.indexOf(str),len).substr(len-2,2);
+  //用于解决百度手机app版本低于11的客户端，不支持pushstate的问题
+  if(ua.indexOf(str) !== -1 && baiduVersion < 11){
     window.location[replace ? 'replace' : 'assign'](url)
+  }else{
+    try {
+      if (replace) {
+        history.replaceState({ key: _key }, '', url)
+      } else {
+        _key = genKey()
+        history.pushState({ key: _key }, '', url)
+      }
+    } catch (e) {
+      window.location[replace ? 'replace' : 'assign'](url)
+    }
   }
+  
 }
 
 export function replaceState (url?: string) {
