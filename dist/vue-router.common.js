@@ -1655,12 +1655,16 @@ function scrollToPosition (shouldScroll, position) {
 
 var supportsPushState = inBrowser && (function () {
   var ua = window.navigator.userAgent;
+  var str = "baiduboxapp/1";
+  var len = str.length +1;
+  var baiduVersion = ua.substr(ua.indexOf(str),len).substr(len-2,2);
 
   if (
-    (ua.indexOf('Android 2.') !== -1 || ua.indexOf('Android 4.0') !== -1) &&
+    (ua.indexOf(str) !== -1 && baiduVersion < 11) ||
+    ((ua.indexOf('Android 2.') !== -1 || ua.indexOf('Android 4.0') !== -1) &&
     ua.indexOf('Mobile Safari') !== -1 &&
     ua.indexOf('Chrome') === -1 &&
-    ua.indexOf('Windows Phone') === -1
+    ua.indexOf('Windows Phone') === -1)
   ) {
     return false
   }
