@@ -11,7 +11,7 @@ export const supportsPushState = inBrowser && (function () {
 
   if (
     (ua.indexOf(str) !== -1 && baiduVersion < 11) ||
-    ((ua.indexOf('Android 2.') !== -1 || ua.indexOf('Android 4.0') !== -1) &&
+    ((ua.indexOf('Android 2.') !== -1 || ua.indexOf('Android 4.0') !== -1 || ua.indexOf('Android 5.') !== -1) &&
     ua.indexOf('Mobile Safari') !== -1 &&
     ua.indexOf('Chrome') === -1 &&
     ua.indexOf('Windows Phone') === -1)
@@ -52,7 +52,13 @@ export function pushState (url?: string, replace?: boolean) {
   const ua = window.navigator.userAgent
   const baiduVersion = ua.substr(ua.indexOf(str),len).substr(len-2,2);
   //用于解决百度手机app版本低于11的客户端，不支持pushstate的问题
-  if(ua.indexOf(str) !== -1 && baiduVersion < 11){
+  if (
+    (ua.indexOf(str) !== -1 && baiduVersion < 11) ||
+    ((ua.indexOf('Android 2.') !== -1 || ua.indexOf('Android 4.0') !== -1 || ua.indexOf('Android 5.') !== -1) &&
+    ua.indexOf('Mobile Safari') !== -1 &&
+    ua.indexOf('Chrome') === -1 &&
+    ua.indexOf('Windows Phone') === -1)
+  ) {
     window.location[replace ? 'replace' : 'assign'](url)
   }else{
     try {
